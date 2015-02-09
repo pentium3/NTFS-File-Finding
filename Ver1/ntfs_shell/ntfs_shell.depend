@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1423472676 source:d:\cpp\ntfs_shell\main.cpp
+	<iostream>
+	<fstream>
+	<cstring>
+	<vector>
+
