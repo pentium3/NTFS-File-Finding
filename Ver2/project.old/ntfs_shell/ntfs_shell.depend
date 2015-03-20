@@ -1,0 +1,14 @@
+# depslib dependency file v1.0
+1423472676 source:d:\cpp\ntfs_shell\main.cpp
+	<iostream>
+	<fstream>
+	<cstring>
+	<vector>
+
+1426878239 source:d:\ntfsfindingproject\finalproductrelease\ntfs-file-finding\ver2\ntfs_shell\main.cpp
+	<iostream>
+	<fstream>
+	<cstring>
+	<vector>
+	<windows.h>
+
