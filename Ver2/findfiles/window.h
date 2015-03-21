@@ -43,7 +43,8 @@
 
 #include <QWidget>
 #include <QDir>
-#include <string.h>
+#include <string>
+using namespace std;
 
 QT_BEGIN_NAMESPACE
 class QComboBox;
@@ -88,7 +89,8 @@ private:
     QDir currentFileDir;
     QStringList files;
     QString fileName,DriveLetter;
-    long long FileNum;
+    long long FileNum,totalFileNum;
+    string sDriveLetter,sfileName;
 };
 //! [0]
 

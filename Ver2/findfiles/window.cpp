@@ -9,6 +9,7 @@
 #include <Windows.h>
 #include <fstream>
 #include <vector>
+#include <QDebug>
 using namespace std;
 
 #define LL long long
@@ -30,9 +31,7 @@ Window::Window(QWidget *parent)
     filesFoundLabel = new QLabel;
 
     createFilesTable();
-//! [0]
 
-//! [1]
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->addWidget(fileLabel, 0, 0);
     mainLayout->addWidget(fileComboBox, 0, 1, 1, 2);
@@ -59,10 +58,10 @@ static void updateComboBox(QComboBox *comboBox)
 
 void Window::USNFindingFile()
 {
-    string sDriveLetter=DriveLetter.toStdString();
+    sDriveLetter=DriveLetter.toStdString();
     //QTextCodec *wincode=QTextCodec::codecForName("gb18030");
     //if (wincode)    sDriveLetter=wincode->fromUnicode(sDriveLetter).data();
-    string sfileName=fileName.toStdString();
+    sfileName=fileName.toStdString();
     //QTextCodec *wincode=QTextCodec::codecForName("gb18030");
     //if (wincode)    sfileName=wincode->fromUnicode(sfileName).data();
 
@@ -79,7 +78,7 @@ void Window::USNFindingFile()
     #define BUF_LEN 4096
 
     ofstream fout("c:\\logf.txt");
-    ofstream nout("c:\\logn.txt"); // the number of files
+    //ofstream nout("c:\\logn.txt"); // the number of files
 
     long counter = 0;		//the number of files
 
@@ -241,12 +240,15 @@ void Window::USNFindingFile()
             fout << flush;
             fout.close();
 
-            nout << counter << endl;
-            nout << sDriveLetter << endl;
-            nout << sfileName << endl;
-    cout << sDriveLetter <<"|||"<<sfileName<<endl;
-            nout << flush;
-            nout.close();
+            totalFileNum=counter;
+
+           // nout << counter << endl;
+           // nout << sDriveLetter << endl;
+           // nout << sfileName << endl;
+          //cout << sDriveLetter <<"|||"<<sfileName<<endl;
+            qDebug() <<fileName<<endl;
+           // nout << flush;
+           // nout.close();
 
         }
 
@@ -281,30 +283,41 @@ void Window::FindFilesPath()
 {
     LL NUM,frn,prn,FL,FilePfrn;
     LL FilesPfrn[10000];
-    string FindFile,Ftmp,ROOT;
+    //string FindFile,Ftmp,ROOT;
+    QString FindFile,Ftmp,ROOT;
     char rubbishch;
 
-    //ofstream ofile("c://logp.txt");
-    ifstream nfile("c://logn.txt");
-    nfile>>NUM;
-    nfile>>ROOT;
-    nfile.get(rubbishch);
-    getline(nfile,FindFile);
-    //cout<<ROOT<<endl;
-    cout<<FindFile<<endl;
-    //cout<<NUM<<endl;
-    nfile.close();
+    NUM=totalFileNum;
+    FindFile=fileName;     //QString    fileName
+    ROOT=DriveLetter;
+    qDebug()<<NUM<<"  |  "<<ROOT<<"  |  "<<FindFile<<endl;
 
-    ifstream fin("c://logf.txt");
+    //ifstream fin("c://logf.txt");
+    QFile fin("c:\logf.txt");
+    fin.open(QIODevice::ReadOnly);
+    QTextStream filestream(&fin);
+    QString RST;
     LL exist=0;
 
     for (LL i=1; i<=NUM; i++)
     {
-        fin>>FL;
-        fin.get(rubbishch);
-        getline(fin,Ftmp);
-        fin>>frn>>prn;
+        //fin>>FL;
+        //fin.get(rubbishch);
+        //getline(fin,Ftmp);
+        //fin>>frn>>prn;
+        RST=filestream.readLine();
+        FL=RST.toLongLong();
+        RST=filestream.readLine();
+        Ftmp=RST;
+        RST=filestream.readLine();
+        frn=RST.toLongLong();
+        RST=filestream.readLine();
+        prn=RST.toLongLong();
+
+        //qDebug()<<i<<" "<<Ftmp<<"  "<<frn<<"  "<<prn<<endl;
+
         if (Ftmp==FindFile)
+        //if (Ftmp.indexOf())
         {
             exist++;
             FilesPfrn[exist]=prn;
@@ -319,26 +332,36 @@ void Window::FindFilesPath()
     {
         for (LL FindTimes=1; FindTimes<=exist; FindTimes++)
         {
-            vector<string>  FilePath;
+            //vector<string>  FilePath;
+            vector<QString> FilePath;
             FilePfrn=FilesPfrn[FindTimes];
 
             bool Found=false;
             LL ReadingCounter=0;
             fin.close();
-            fin.open("c://logf.txt");
+            fin.open(QIODevice::ReadOnly);
             while (!Found)
             {
                 if (ReadingCounter==NUM)
                 {
                     //fin.seekg(0,ios::beg);
                     fin.close();
-                    fin.open("c://logf.txt");
+                    fin.open(QIODevice::ReadOnly);
                     ReadingCounter=0;
                 }
-                fin>>FL;
-                fin.get(rubbishch);
-                getline(fin,Ftmp);
-                fin>>frn>>prn;
+                //fin>>FL;
+                //fin.get(rubbishch);
+                //getline(fin,Ftmp);
+                //fin>>frn>>prn;
+                RST=filestream.readLine();
+                FL=RST.toLongLong();
+                RST=filestream.readLine();
+                Ftmp=RST;
+                RST=filestream.readLine();
+                frn=RST.toLongLong();
+                RST=filestream.readLine();
+                prn=RST.toLongLong();
+
                 ReadingCounter++;
                 //cout<<ReadingCounter<<" Finding :  "<<Ftmp<<endl;
                 if (frn==FilePfrn)
@@ -354,18 +377,12 @@ void Window::FindFilesPath()
             }
             LL TMP=FilePath.size();
 
-            string pathtmp=ROOT+":/";
-            for (vector<string>::iterator i=FilePath.end()-1; i!=FilePath.begin()-1; i--)
+            QString pathtmp=ROOT+":/";
+            for (vector<QString>::iterator i=FilePath.end()-1; i!=FilePath.begin()-1; i--)
                 pathtmp=pathtmp+*i+"/";
             //cout<<pathtmp<<endl;
-            path[FindTimes-1]=QString::fromStdString(pathtmp);
-            /*
-            ofile<<ROOT<<":/";          //cout<<ROOT<<":/";
-            //for (vector<string>::iterator i=FilePath.begin(); i!=FilePath.end(); i++)
-            for (vector<string>::iterator i=FilePath.end()-1; i!=FilePath.begin()-1; i--)
-                ofile<<*i<<"/";         //cout<<*i<<"/";
-            ofile<<endl;                //cout<<endl;
-            */
+            //path[FindTimes-1]=QString::fromStdString(pathtmp);
+            path[FindTimes-1]=pathtmp;
         }
     }
     FileNum=exist;
@@ -392,31 +409,11 @@ void Window::find()
     //currentDir=QDir(path);
     //files.append("main.cpp");
     //showFiles(files);
-/*
-    QFile pathfile("C:\\logp.txt");
-    if(!pathfile.open(QIODevice::ReadOnly | QIODevice::Text))
-        cout << "Open failed." << endl;
 
-
-    QTextStream txtInput(&pathfile);
-    QString lineStr;
-    lineStr=txtInput.readLine();
-    int filenum=lineStr.toInt();
-    for (int i=1;i<=filenum;i++)
-    {
-        lineStr = txtInput.readLine();
-        path[i-1]=lineStr;
-        files.append(fileName);
-        qDebug() << path << endl;
-    }
-*/
     for (int i=1;i<=FileNum;i++)
         files.append(fileName);
 
-
     showFiles(files);
-
-    //pathfile.close();
 }
 
 
